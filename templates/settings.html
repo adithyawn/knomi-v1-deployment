@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" integrity="sha384-vp86vTRFVJgpjF9jiIGPEEqYqlDwgyBgEF109VFjmqGmIY/Y4HV4d3Gp2irVfcrp" crossorigin="anonymous">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
+
+    <title>Settings</title>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-sm navbar-dark pb-2">
+        <div class="container">
+            <a href="#" class="navbar-brand">Knomi</a>
+            <button class="navbar-toggler" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item px-2 ml-auto">
+                        <a href="{{url_for('knowledgebase')}}" class="nav-link">Knowledge Base</a>
+                    </li>
+
+                    {% if current_user.status == 1 %}
+                    <li class="nav-item px-2 ml-auto">
+                        <a href="{{url_for('category')}}" class="nav-link">Category</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% if current_user.status == 1 %}
+                    <li class="nav-item px-2 ml-auto">
+                        <a href="{{url_for('settings')}}" class="nav-link active">Settings</a>
+                    </li>
+                    {% endif %}
+
+                    <li class="nav-item px-2 ml-auto">
+                        <a href="{{url_for('logout')}}" class="nav-link"> <i class="fas fa-power-off"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div id="form-section" class="">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-10">
+                    <form action="{{url_for('adduser')}}" method="POST">
+                        {{form.csrf_token()}}
+
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages  %}
+                            {% for category, message in messages %}
+                                {% if category == 'success' %}
+                                <div class="alert alert-{{ category }} my-3" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>           
+                                {% elif category == 'danger' %}
+                                <div class="alert alert-{{ category }} my-3" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>                                </div>                        
+                                {% endif %}                                                           
+                            {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+                        {% if message %}
+                            <span style="color:red;">{{message}}</span>
+                        {% endif %}
+
+                        <div class="mt-4 mb">
+                            <label for="name">Nama : </label>
+                            <!-- <input id="name" class="form-control mb-3" type="text" placeholder="Nama Lengkap"> -->     
+                            {{form.name(class="form-control mb-3", placeholder="Nama Lengkap")}}
+                            <ul>
+                                {% for error in form.name.errors %}
+                                    <li style="color:  rgb(0, 89, 255);">{{error}}</li>
+                                {% endfor %}
+                            </ul>                            
+                        </div>
+                        <div class="mt-4 mb">
+                            <label for="username">Username : </label>
+                            <!-- <input id="username" class="form-control mb-3" type="text" placeholder="Username"> -->
+                            {{form.username(class="form-control mb-3", placeholder="Username")}}
+                            <ul>
+                                {% for error in form.username.errors %}
+                                    <li style="color:  rgb(0, 89, 255);">{{error}}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="">
+                            <label for="password">Password : </label>
+                            <!-- <input id="real-url" class="form-control mb-4" type="password" placeholder="Password"> -->
+                            {{form.password(class="form-control mb-3", placeholder="Password")}}
+                            <ul>
+                                {% for error in form.password.errors %}
+                                    <li style="color: rgb(0, 89, 255);">{{error}}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="">
+                            <label for="password_confirm">Confirm Password : </label>
+                            <!-- <input id="real-url" class="form-control mb-4" type="password" placeholder="Confirm Password"> -->
+                            {{form.password_confirm(class="form-control mb-3", placeholder="Password")}}
+                            <ul>
+                                {% for error in form.password_confirm.errors %}
+                                    <li style="color:  rgb(0, 89, 255);">{{error}}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="mb-5">
+                            <label for="status">Jenis Akun: </label>
+                            {{form.status(class="form-control")}}
+                        </div>
+                        <button class="btn btn-primary px-5 d-block mx-auto" type="submit">Tambahkan Akun</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-5">
+
+        <div id="account-section" class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Nama Lengkap</th>
+                        <th>Username</th>
+                        <th>Jenis Akun</th>
+                        <th class="text-center">#</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in query_user %}
+                    <tr>
+                        <th scope="row">{{loop.index}}</th>
+                        <td>{{i.name}}</td>
+                        <td>{{i.username}}</td>
+                        <td>{{i.status}}</td>
+                        <td class="text-center">
+                            <a href="/edituser/{{i.id}}" class=" text-decoration-none text-black-50 "> <small><i class="fas fa-pen text-da text-s" ></i> Edit</small></a> |
+                            <a href="/deleteuser/{{i.id}}" class="text-decoration-none text-black-50 "><small><i class="fas fa-trash-alt text-danger"></i> Delete</small></a>
+                        </td>
+                    </tr>                        
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+
+
+    <!-- JQuery 3 Minified -->
+    <script src="http://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+
+    <!-- Popper JS Bootstrap -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <!-- Local JS -->
+    <script>
+        // Get current year for copyright
+        $('#year').text(new Date().getFullYear());
+    </script>
+
+</body>
+</html>

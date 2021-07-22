@@ -1,0 +1,5 @@
+# dependencies
+/venv
+
+# migration
+/migrations
